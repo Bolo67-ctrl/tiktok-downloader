@@ -136,7 +136,7 @@ export default function App() {
       const anchor = document.createElement("a");
 
       anchor.href = fileUrl;
-      anchor.download = `clipsave-${Date.now()}.mp4`;
+      anchor.download = `tikzuno-${Date.now()}.mp4`;
 
       document.body.appendChild(anchor);
       anchor.click();
@@ -159,9 +159,9 @@ export default function App() {
   return (
     <div className="site">
       <header className="header">
-        <a className="brand" href="/" aria-label="ClipSave home">
+        <a className="brand" href="/" aria-label="TikZuno home">
           <span className="brand-icon" aria-hidden="true">↓</span>
-          Clip<span>Save</span>
+          Tik<span>Zuno</span>
         </a>
 
         <a className="nav-link" href="#how-it-works">
@@ -322,7 +322,7 @@ export default function App() {
       </main>
 
       <footer>
-        <span>© {new Date().getFullYear()} ClipSave</span>
+        <span>© {new Date().getFullYear()} TikZuno</span>
         <span>Independent tool. Not affiliated with TikTok.</span>
       </footer>
     </div>

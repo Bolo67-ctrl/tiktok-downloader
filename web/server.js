@@ -206,7 +206,7 @@ app.use((error, req, res, next) => {
 });
 
 const server = app.listen(3001, "127.0.0.1", () => {
-  console.log("ClipSave server ready on port 3001 — using RapidAPI");
+  console.log("TikZuno server ready on port 3001 — using RapidAPI");
 });
 
 server.on("error", (error) => {
