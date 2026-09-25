@@ -205,11 +205,15 @@ app.use((error, req, res, next) => {
   });
 });
 
-const server = app.listen(3001, "127.0.0.1", () => {
-  console.log("TikZuno server ready on port 3001 — using RapidAPI");
-});
+if (!process.env.VERCEL) {
+  const server = app.listen(3001, "127.0.0.1", () => {
+    console.log("TikZuno server ready on port 3001 — using RapidAPI");
+  });
 
-server.on("error", (error) => {
-  console.error("Server could not start:", error.message);
-  process.exit(1);
-});
+  server.on("error", (error) => {
+    console.error("Server could not start:", error.message);
+    process.exit(1);
+  });
+}
+
+export default app;
