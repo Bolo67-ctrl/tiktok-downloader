@@ -47,21 +47,16 @@ func renderIcon(pixels: Int, destination: URL) throws {
     precondition(CGImageDestinationFinalize(writer), "PNG export failed")
 }
 
-let folder = URL(fileURLWithPath: "Assets.xcassets/AppIcon.appiconset", isDirectory: true)
+// Standalone icon files are intentionally included in the bundle for sideloading.
+let folder = URL(fileURLWithPath: "Icons", isDirectory: true)
 try FileManager.default.createDirectory(at: folder, withIntermediateDirectories: true)
-var entries: [[String: String]] = []
-func add(idiom: String, points: Double, scales: [Int]) throws {
+let sizes: [(Double, [Int])] = [(20,[1,2,3]),(29,[1,2,3]),(40,[1,2,3]),(60,[2,3]),(76,[1,2]),(83.5,[2])]
+for (points, scales) in sizes {
     let pointString = points.truncatingRemainder(dividingBy: 1) == 0 ? String(Int(points)) : String(points)
     for scale in scales {
-        let filename = "Icon-\(idiom)-\(pointString)@\(scale)x.png"
+        let suffix = scale == 1 ? "" : "@\(scale)x"
+        let filename = "InstazunoIcon\(pointString)\(suffix).png"
         try renderIcon(pixels: Int(points * Double(scale)), destination: folder.appendingPathComponent(filename))
-        entries.append(["idiom": idiom, "size": "\(pointString)x\(pointString)", "scale": "\(scale)x", "filename": filename])
     }
 }
-for points in [20.0,29.0,40.0,60.0] { try add(idiom: "iphone", points: points, scales: [2,3]) }
-for points in [20.0,29.0,40.0,76.0] { try add(idiom: "ipad", points: points, scales: [1,2]) }
-try add(idiom: "ipad", points: 83.5, scales: [2])
-try add(idiom: "ios-marketing", points: 1024, scales: [1])
-let contents: [String: Any] = ["images": entries, "info": ["author": "xcode", "version": 1]]
-try JSONSerialization.data(withJSONObject: contents, options: [.prettyPrinted, .sortedKeys]).write(to: folder.appendingPathComponent("Contents.json"))
-print("Generated and checked \(entries.count) opaque app icons")
+print("Generated and checked standalone Home Screen icons")
