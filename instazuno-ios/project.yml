@@ -6,7 +6,7 @@ settings:
   base:
     SWIFT_VERSION: '5.0'
     CODE_SIGNING_ALLOWED: NO
-    MARKETING_VERSION: '1.0.0'
+    MARKETING_VERSION: '1.0.1'
     CURRENT_PROJECT_VERSION: '1'
 targets:
   Instazuno:
@@ -25,6 +25,8 @@ targets:
       path: Info.plist
       properties:
         CFBundleDisplayName: Instazuno
+        CFBundleShortVersionString: "$(MARKETING_VERSION)"
+        CFBundleVersion: "$(CURRENT_PROJECT_VERSION)"
         LSRequiresIPhoneOS: true
         UIApplicationSceneManifest:
           UIApplicationSupportsMultipleScenes: false
