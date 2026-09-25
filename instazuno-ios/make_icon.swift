@@ -1,23 +1,67 @@
-import AppKit
 import Foundation
-let size = 1024
-let bitmap = NSBitmapImageRep(bitmapDataPlanes: nil, pixelsWide: size, pixelsHigh: size, bitsPerSample: 8, samplesPerPixel: 3, hasAlpha: false, isPlanar: false, colorSpaceName: .deviceRGB, bytesPerRow: 0, bitsPerPixel: 0)!
-NSGraphicsContext.saveGraphicsState()
-NSGraphicsContext.current = NSGraphicsContext(bitmapImageRep: bitmap)
-let pink = NSColor(srgbRed: 229.0/255, green: 38.0/255, blue: 136.0/255, alpha: 1)
-let orange = NSColor(srgbRed: 1, green: 132.0/255, blue: 61.0/255, alpha: 1)
-NSGradient(starting: pink, ending: orange)!.draw(in: NSRect(x: 0, y: 0, width: CGFloat(size), height: CGFloat(size)), angle: -45)
-let path = NSBezierPath()
-func pt(_ x: CGFloat, _ y: CGFloat) -> NSPoint { NSPoint(x: x*16, y: (64-y)*16) }
-path.move(to: pt(23,18)); path.line(to: pt(45,18)); path.line(to: pt(24,46)); path.line(to: pt(45,46))
-path.move(to: pt(20,46)); path.line(to: pt(18,46))
-path.lineWidth = 96; path.lineCapStyle = .round; path.lineJoinStyle = .round
-NSColor.white.setStroke(); path.stroke()
-NSGraphicsContext.restoreGraphicsState()
+import CoreGraphics
+import ImageIO
+import UniformTypeIdentifiers
+
+// Draw directly into an explicitly supported four-byte RGB context.
+// AppKit's three-channel NSBitmapImageRep did not produce a drawing context.
+func renderIcon(pixels: Int, destination: URL) throws {
+    let colorSpace = CGColorSpace(name: CGColorSpace.sRGB)!
+    guard let context = CGContext(data: nil, width: pixels, height: pixels,
+        bitsPerComponent: 8, bytesPerRow: pixels * 4, space: colorSpace,
+        bitmapInfo: CGImageAlphaInfo.noneSkipLast.rawValue) else {
+        fatalError("Cannot create icon drawing context")
+    }
+    let scale = CGFloat(pixels) / 64
+    context.translateBy(x: 0, y: CGFloat(pixels))
+    context.scaleBy(x: scale, y: -scale)
+    let colors = [
+        CGColor(colorSpace: colorSpace, components: [229.0/255, 38.0/255, 136.0/255, 1])!,
+        CGColor(colorSpace: colorSpace, components: [1, 132.0/255, 61.0/255, 1])!
+    ] as CFArray
+    let gradient = CGGradient(colorsSpace: colorSpace, colors: colors, locations: [0, 1])!
+    context.drawLinearGradient(gradient, start: CGPoint(x: 0, y: 0), end: CGPoint(x: 64, y: 64), options: [.drawsBeforeStartLocation, .drawsAfterEndLocation])
+    context.setStrokeColor(CGColor(colorSpace: colorSpace, components: [1,1,1,1])!)
+    context.setLineWidth(6)
+    context.setLineCap(.round)
+    context.setLineJoin(.round)
+    context.move(to: CGPoint(x: 23, y: 18))
+    context.addLine(to: CGPoint(x: 45, y: 18))
+    context.addLine(to: CGPoint(x: 24, y: 46))
+    context.addLine(to: CGPoint(x: 45, y: 46))
+    context.move(to: CGPoint(x: 20, y: 46))
+    context.addLine(to: CGPoint(x: 18, y: 46))
+    context.strokePath()
+    // Fail the build if graphics generation produces a blank image again.
+    let bytes = context.data!.assumingMemoryBound(to: UInt8.self)
+    var white = 0
+    var colored = 0
+    for i in stride(from: 0, to: pixels * pixels * 4, by: 4) {
+        if bytes[i] > 240 && bytes[i+1] > 240 && bytes[i+2] > 240 { white += 1 }
+        if bytes[i] > 180 && bytes[i+1] < 180 { colored += 1 }
+    }
+    precondition(white > pixels * pixels / 20 && colored > pixels * pixels / 2, "Icon pixels must contain both the white logo and gradient")
+    let image = context.makeImage()!
+    let writer = CGImageDestinationCreateWithURL(destination as CFURL, UTType.png.identifier as CFString, 1, nil)!
+    CGImageDestinationAddImage(writer, image, nil)
+    precondition(CGImageDestinationFinalize(writer), "PNG export failed")
+}
+
 let folder = URL(fileURLWithPath: "Assets.xcassets/AppIcon.appiconset", isDirectory: true)
 try FileManager.default.createDirectory(at: folder, withIntermediateDirectories: true)
-try bitmap.representation(using: .png, properties: [:])!.write(to: folder.appendingPathComponent("AppIcon.png"))
-let json = """
-{"images":[{"filename":"AppIcon.png","idiom":"universal","platform":"ios","size":"1024x1024"}],"info":{"author":"xcode","version":1}}
-"""
-try json.write(to: folder.appendingPathComponent("Contents.json"), atomically: true, encoding: .utf8)
+var entries: [[String: String]] = []
+func add(idiom: String, points: Double, scales: [Int]) throws {
+    let pointString = points.truncatingRemainder(dividingBy: 1) == 0 ? String(Int(points)) : String(points)
+    for scale in scales {
+        let filename = "Icon-\(idiom)-\(pointString)@\(scale)x.png"
+        try renderIcon(pixels: Int(points * Double(scale)), destination: folder.appendingPathComponent(filename))
+        entries.append(["idiom": idiom, "size": "\(pointString)x\(pointString)", "scale": "\(scale)x", "filename": filename])
+    }
+}
+for points in [20.0,29.0,40.0,60.0] { try add(idiom: "iphone", points: points, scales: [2,3]) }
+for points in [20.0,29.0,40.0,76.0] { try add(idiom: "ipad", points: points, scales: [1,2]) }
+try add(idiom: "ipad", points: 83.5, scales: [2])
+try add(idiom: "ios-marketing", points: 1024, scales: [1])
+let contents: [String: Any] = ["images": entries, "info": ["author": "xcode", "version": 1]]
+try JSONSerialization.data(withJSONObject: contents, options: [.prettyPrinted, .sortedKeys]).write(to: folder.appendingPathComponent("Contents.json"))
+print("Generated and checked \(entries.count) opaque app icons")
