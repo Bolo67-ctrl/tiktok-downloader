@@ -1,0 +1,58 @@
+name: Build Instazuno IPA
+on:
+  workflow_dispatch:
+  push:
+    branches: [codex-instazuno-ios]
+    paths: ['instazuno-ios/**', '.github/workflows/instazuno-ipa.yml']
+permissions:
+  contents: read
+concurrency:
+  group: instazuno-ios-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  build:
+    runs-on: macos-26
+    timeout-minutes: 20
+    defaults:
+      run:
+        working-directory: instazuno-ios
+    steps:
+      - uses: actions/checkout@v4
+      - name: Prepare project and icon
+        run: |
+          command -v xcodegen || brew install xcodegen
+          swift make_icon.swift
+          xcodegen generate
+      - name: Build iPhone app
+        run: |
+          set -o pipefail
+          xcodebuild -project Instazuno.xcodeproj -scheme Instazuno \
+            -configuration Release -sdk iphoneos -destination 'generic/platform=iOS' \
+            -derivedDataPath build/ios CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO \
+            CODE_SIGN_IDENTITY='' CURRENT_PROJECT_VERSION="${{ github.run_number }}" \
+            build | tee build-ios.log
+      - name: Package IPA
+        run: |
+          mkdir -p build/package/Payload
+          cp -R build/ios/Build/Products/Release-iphoneos/Instazuno.app build/package/Payload/
+          test -f build/package/Payload/Instazuno.app/Instazuno
+          /usr/libexec/PlistBuddy -c 'Print CFBundleIdentifier' build/package/Payload/Instazuno.app/Info.plist
+          cd build/package
+          /usr/bin/zip -qr ../Instazuno-unsigned.ipa Payload
+          cd ..
+          shasum -a 256 Instazuno-unsigned.ipa > Instazuno-unsigned.ipa.sha256
+      - uses: actions/upload-artifact@v4
+        with:
+          name: Instazuno-IPA
+          path: |
+            instazuno-ios/build/Instazuno-unsigned.ipa
+            instazuno-ios/build/Instazuno-unsigned.ipa.sha256
+          if-no-files-found: error
+          retention-days: 14
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: Instazuno-build-log
+          path: instazuno-ios/build-ios.log
+          if-no-files-found: ignore
+          retention-days: 7
