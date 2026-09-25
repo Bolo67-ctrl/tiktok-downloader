@@ -1,14 +1,7 @@
 import { useState } from "react";
 import { isNative, openNativeVideo, readClipboard, requestVideo, saveNativeVideo } from "./native";
+import { parseTikTokUrl } from "./tiktokUrl";
 import "./App.css";
-
-const allowedHosts = new Set([
-  "tiktok.com",
-  "www.tiktok.com",
-  "m.tiktok.com",
-  "vm.tiktok.com",
-  "vt.tiktok.com",
-]);
 
 export default function App() {
   const [link, setLink] = useState("");
@@ -46,18 +39,7 @@ export default function App() {
     let url;
 
     try {
-      url = new URL(link.trim());
-
-      if (
-        url.protocol !== "https:" ||
-        !allowedHosts.has(url.hostname) ||
-        url.username ||
-        url.password ||
-        url.port ||
-        url.pathname === "/"
-      ) {
-        throw new Error("Invalid link");
-      }
+      url = parseTikTokUrl(link);
     } catch {
       setMessage("Please paste a valid TikTok video link.");
       return;
