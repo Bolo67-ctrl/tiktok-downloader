@@ -1,0 +1,35 @@
+{
+  "version": "1.0",
+  "sourceName": "Zuno",
+  "sourceAuthor": "Bolo67-ctrl",
+  "sourceLinkTitle": "Zuno",
+  "sourceLinkUrl": "https://tikzuno.vercel.app",
+  "sourceImage": "https://github.com/Bolo67-ctrl.png",
+  "sourceUpdateTime": "2026-09-29T11:00:00-0400",
+  "sourceDescription": "Zuno apps — TikZuno and InstaZuno.",
+  "appCategories": [
+    "Tools"
+  ],
+  "appRepositories": [
+    {
+      "appType": "LINK",
+      "appCateIndex": 0,
+      "appUpdateTime": "2026-09-29T11:00:00-0400",
+      "appName": "TikZuno",
+      "appVersion": "1.0.0",
+      "appImage": "https://github.com/Bolo67-ctrl.png",
+      "appPackage": "https://tikzuno.vercel.app",
+      "appDescription": "TikTok downloader. Opens TikZuno."
+    },
+    {
+      "appType": "LINK",
+      "appCateIndex": 0,
+      "appUpdateTime": "2026-09-29T11:00:00-0400",
+      "appName": "InstaZuno",
+      "appVersion": "1.0.2",
+      "appImage": "https://github.com/Bolo67-ctrl.png",
+      "appPackage": "https://instazuno.davefrancois043.chatgpt.site",
+      "appDescription": "Instagram downloader. Opens InstaZuno."
+    }
+  ]
+}
