@@ -1,0 +1,74 @@
+name: Build TikZuno IPA
+
+on:
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - 'web/**'
+      - '.github/workflows/ios-ipa.yml'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ios-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    name: Build unsigned iPhone app
+    runs-on: macos-26
+    timeout-minutes: 25
+    defaults:
+      run:
+        working-directory: web
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+          cache-dependency-path: web/package-lock.json
+      - run: npm ci
+      - run: npm test
+      - run: npm run lint
+      - run: npm run ios:sync
+      - name: Compile for a physical iPhone
+        run: |
+          set -o pipefail
+          xcodebuild \
+            -project ios/App/App.xcodeproj \
+            -scheme App \
+            -configuration Release \
+            -sdk iphoneos \
+            -destination 'generic/platform=iOS' \
+            -derivedDataPath build/ios \
+            CODE_SIGNING_ALLOWED=NO \
+            CODE_SIGNING_REQUIRED=NO \
+            CODE_SIGN_IDENTITY='' \
+            CURRENT_PROJECT_VERSION="${{ github.run_number }}" \
+            build | tee build-ios.log
+      - name: Package unsigned IPA for GBox
+        run: |
+          mkdir -p build/package/Payload
+          cp -R build/ios/Build/Products/Release-iphoneos/App.app build/package/Payload/
+          test -f build/package/Payload/App.app/App
+          cd build/package
+          /usr/bin/zip -qr ../TikZuno-unsigned.ipa Payload
+          cd ..
+          shasum -a 256 TikZuno-unsigned.ipa > TikZuno-unsigned.ipa.sha256
+      - uses: actions/upload-artifact@v4
+        with:
+          name: TikZuno-IPA
+          path: |
+            web/build/TikZuno-unsigned.ipa
+            web/build/TikZuno-unsigned.ipa.sha256
+          if-no-files-found: error
+          retention-days: 14
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: ios-build-log
+          path: web/build-ios.log
+          if-no-files-found: ignore
+          retention-days: 7

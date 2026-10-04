@@ -1,13 +1,7 @@
 import { useState } from "react";
+import { isNative, openNativeVideo, readClipboard, requestVideo, saveNativeVideo } from "./native";
+import { parseTikTokUrl } from "./tiktokUrl";
 import "./App.css";
-
-const allowedHosts = new Set([
-  "tiktok.com",
-  "www.tiktok.com",
-  "m.tiktok.com",
-  "vm.tiktok.com",
-  "vt.tiktok.com",
-]);
 
 export default function App() {
   const [link, setLink] = useState("");
@@ -26,7 +20,7 @@ export default function App() {
 
   async function pasteLink() {
     try {
-      const text = await navigator.clipboard.readText();
+      const text = await readClipboard();
       updateLink(text.trim());
     } catch {
       setMessage(
@@ -45,18 +39,7 @@ export default function App() {
     let url;
 
     try {
-      url = new URL(link.trim());
-
-      if (
-        url.protocol !== "https:" ||
-        !allowedHosts.has(url.hostname) ||
-        url.username ||
-        url.password ||
-        url.port ||
-        url.pathname === "/"
-      ) {
-        throw new Error("Invalid link");
-      }
+      url = parseTikTokUrl(link);
     } catch {
       setMessage("Please paste a valid TikTok video link.");
       return;
@@ -65,14 +48,7 @@ export default function App() {
     setLoading(true);
 
     try {
-      const response = await fetch("/api/video", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ url: url.href }),
-        signal: AbortSignal.timeout(30000),
-      });
-
-      const data = await response.json().catch(() => null);
+      const { ok, data } = await requestVideo(url.href);
 
       if (!data) {
         throw new Error(
@@ -80,7 +56,7 @@ export default function App() {
         );
       }
 
-      if (!response.ok) {
+      if (!ok) {
         throw new Error(
           data.error || "Could not find this video."
         );
@@ -114,6 +90,11 @@ export default function App() {
     setMessage("Preparing your download…");
 
     try {
+      if (isNative) {
+        setMessage(await saveNativeVideo(video.videoUrl, setMessage));
+        return;
+      }
+
       const response = await fetch(video.videoUrl, {
         credentials: "omit",
         signal: AbortSignal.timeout(60000),
@@ -147,9 +128,13 @@ export default function App() {
       setMessage(
         "Download requested. Check your browser’s downloads."
       );
-    } catch {
+    } catch (error) {
       setMessage(
-        "Direct saving failed. Try Open video below, then use your browser’s save or share menu."
+        isNative
+          ? (/cancel/i.test(error?.message || "")
+              ? "Save cancelled. Tap Save video to try again."
+              : "Could not save the video. Check your connection or find the video again to refresh its link.")
+          : "Direct saving failed. Try Open video below, then use your browser’s save or share menu."
       );
     } finally {
       setSaving(false);
@@ -264,7 +249,7 @@ export default function App() {
                 >
                   {saving
                     ? "Preparing download…"
-                    : "Download video ↓"}
+                    : isNative ? "Save video ↓" : "Download video ↓"}
                 </button>
 
                 <a
@@ -272,6 +257,12 @@ export default function App() {
                   href={video.videoUrl}
                   target="_blank"
                   rel="noopener noreferrer"
+                  onClick={isNative ? (event) => {
+                    event.preventDefault();
+                    openNativeVideo(video.videoUrl).catch(() =>
+                      setMessage("Could not open the video. Please try again.")
+                    );
+                  } : undefined}
                 >
                   Open video ↗
                 </a>
