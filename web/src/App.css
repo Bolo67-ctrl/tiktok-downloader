@@ -425,15 +425,24 @@ footer {
   animation: intro-content-in 650ms cubic-bezier(.2,.8,.2,1) both, intro-content-out 500ms ease-in 1.55s forwards;
 }
 
+.intro-brand {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  transform-origin: center;
+}
+
 .intro-logo {
   display: grid;
+  flex: 0 0 auto;
   place-items: center;
-  width: 76px;
-  height: 76px;
-  border-radius: 23px;
+  width: 58px;
+  height: 58px;
+  border-radius: 16px;
   background: #75f5ce;
-  color: #091b15;
-  font-size: 58px;
+  color: #101714;
+  font-size: 43px;
   font-weight: 800;
   box-shadow: 0 0 55px #75f5ce40;
   transform-origin: center;
@@ -441,10 +450,10 @@ footer {
 }
 
 .intro-wordmark {
-  margin-top: 20px;
-  font-size: clamp(42px, 10vw, 60px);
-  font-weight: 850;
-  letter-spacing: -3px;
+  margin-top: 0;
+  font-size: clamp(38px, 9vw, 54px);
+  font-weight: 800;
+  letter-spacing: -2.5px;
 }
 
 .intro-wordmark span {
