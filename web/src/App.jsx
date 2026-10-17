@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import "./App.css";
 
 const allowedHosts = new Set([
@@ -11,7 +11,13 @@ const allowedHosts = new Set([
 ]);
 
 export default function App() {
+  const [showIntro, setShowIntro] = useState(true);
   const [link, setLink] = useState("");
+
+  useEffect(() => {
+    const introTimer = window.setTimeout(() => setShowIntro(false), 2400);
+    return () => window.clearTimeout(introTimer);
+  }, []);
   const [message, setMessage] = useState("");
   const [video, setVideo] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -160,7 +166,19 @@ export default function App() {
   }
 
   return (
-    <div className="site">
+    <>
+      {showIntro && (
+        <div className="intro-screen" role="status" aria-label="Welcome to TikZuno">
+          <div className="intro-glow" />
+          <div className="intro-content">
+            <div className="intro-logo">↓</div>
+            <div className="intro-wordmark">Tik<span>Zuno</span></div>
+            <p className="intro-tagline">LESS CLUTTER. MORE VIDEO.</p>
+            <div className="intro-loader"><span /></div>
+          </div>
+        </div>
+      )}
+      <div className="site">
       <header className="header">
         <a className="brand" href="/" aria-label="TikZuno home">
           <span className="brand-icon" aria-hidden="true">↓</span>
@@ -288,6 +306,7 @@ export default function App() {
         <span>© {new Date().getFullYear()} TikZuno</span>
         <span>Independent tool. Not affiliated with TikTok.</span>
       </footer>
-    </div>
+      </div>
+    </>
   );
 }
