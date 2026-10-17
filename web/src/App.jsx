@@ -184,7 +184,7 @@ export default function App() {
       <header className="header">
         <a className="brand" href="/" aria-label="TikZuno home">
           <span className="brand-icon" aria-hidden="true">↓</span>
-          Tik<span>Zuno</span>
+          <span className="brand-name">Tik<span>Zuno</span></span>
         </a>
         <a className="nav-link" href="#how-it-works">How it works ↗</a>
       </header>
