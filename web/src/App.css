@@ -532,3 +532,20 @@ footer {
     animation-iteration-count: 1;
   }
 }
+
+
+/* Keep navbar wordmark grouped exactly like the logo shown in the header */
+.brand-name {
+  display: inline-flex;
+  align-items: center;
+  white-space: nowrap;
+}
+
+.intro-brand {
+  animation: intro-brand-open 850ms ease-in 1.35s forwards;
+}
+
+@keyframes intro-brand-open {
+  0% { transform: scale(1); opacity: 1; filter: blur(0); }
+  100% { transform: scale(1.45); opacity: 0; filter: blur(8px); }
+}
