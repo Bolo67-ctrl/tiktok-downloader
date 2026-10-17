@@ -21,31 +21,45 @@ const allowedHosts = new Set([
   "m.tiktok.com",
   "vm.tiktok.com",
   "vt.tiktok.com",
+  "pro.tiktok.com",
 ]);
 
 let busy = false;
 let nextRequestAt = 0;
 
 function safeHttpsUrl(value) {
-  if (typeof value !== "string" || !value.trim()) {
-    return null;
-  }
+  if (typeof value !== "string" || !value.trim()) return null;
 
   try {
     const url = new URL(value);
-
-    if (
-      url.protocol !== "https:" ||
-      url.username ||
-      url.password
-    ) {
+    if (url.protocol !== "https:" || url.username || url.password) {
       return null;
     }
-
     return url.href;
   } catch {
     return null;
   }
+}
+
+function extractImageUrl(image) {
+  if (typeof image === "string") return safeHttpsUrl(image);
+  if (!image || typeof image !== "object") return null;
+
+  for (const key of ["url", "image_url", "imageUrl", "origin_url", "display_image"]) {
+    const direct = safeHttpsUrl(image[key]);
+    if (direct) return direct;
+  }
+
+  for (const key of ["url_list", "urlList", "urls"]) {
+    if (Array.isArray(image[key])) {
+      for (const value of image[key]) {
+        const url = safeHttpsUrl(value);
+        if (url) return url;
+      }
+    }
+  }
+
+  return null;
 }
 
 app.get("/api/health", (req, res) => {
@@ -59,13 +73,11 @@ app.post("/api/video", async (req, res) => {
 
   try {
     const input = req.body?.url;
-
     if (typeof input !== "string" || input.length > 2048) {
       throw new Error("Invalid input");
     }
 
     videoLink = new URL(input.trim());
-
     if (
       videoLink.protocol !== "https:" ||
       !allowedHosts.has(videoLink.hostname) ||
@@ -78,7 +90,7 @@ app.post("/api/video", async (req, res) => {
     }
   } catch {
     return res.status(400).json({
-      error: "Please paste a valid TikTok video link.",
+      error: "Please paste a valid TikTok or TikTok Pro link.",
     });
   }
 
@@ -106,77 +118,71 @@ app.post("/api/video", async (req, res) => {
     });
 
     if (!response.ok) {
-      console.error(
-        `RapidAPI request failed: HTTP ${response.status}`
-      );
+      console.error(`RapidAPI request failed: HTTP ${response.status}`);
 
       if (response.status === 401 || response.status === 403) {
         return res.status(502).json({
-          error:
-            "Video service authorization failed. Check the API key and subscription.",
+          error: "Video service authorization failed. Check the API key and subscription.",
         });
       }
-
       if (response.status === 429) {
         return res.status(429).json({
-          error:
-            "The video service request limit has been reached. Please try again later.",
+          error: "The video service request limit has been reached. Please try again later.",
         });
       }
-
-      throw new Error(
-        `RapidAPI returned HTTP ${response.status}`
-      );
+      throw new Error(`RapidAPI returned HTTP ${response.status}`);
     }
 
     const responseText = await response.text();
     let result;
-
     try {
       result = JSON.parse(responseText);
     } catch {
-      throw new Error(
-        "RapidAPI returned an unexpected response instead of JSON."
-      );
+      throw new Error("RapidAPI returned an unexpected response instead of JSON.");
     }
 
     if (!result || result.code !== 0 || !result.data) {
-      console.error("RapidAPI could not resolve the video:", {
-        code: result?.code,
-      });
-
+      console.error("RapidAPI could not resolve the link:", { code: result?.code });
+      const isProLink = videoLink.hostname === "pro.tiktok.com";
       return res.status(422).json({
-        error:
-          "Could not find this video. Try another public video link.",
+        error: isProLink
+          ? "This TikTok Pro link could not be resolved as a public post. Open the post in TikTok Pro and try its share link again; referral or event links may not contain downloadable media."
+          : "Could not find this post. Try another public TikTok video or photo-post link.",
       });
     }
 
     const data = result.data;
+    const images = Array.isArray(data.images)
+      ? [...new Set(data.images.map(extractImageUrl).filter(Boolean))]
+      : [];
 
-    if (Array.isArray(data.images) && data.images.length > 0) {
-      return res.status(422).json({
-        error: "This is a photo post. Please use a video link.",
+    const common = {
+      title: typeof data.title === "string" && data.title.trim()
+        ? data.title
+        : images.length ? "TikTok photo post" : "TikTok video",
+      author: typeof data.author?.nickname === "string" ? data.author.nickname : "",
+      cover: safeHttpsUrl(data.cover),
+    };
+
+    if (images.length > 0) {
+      return res.json({
+        ...common,
+        mediaType: "photos",
+        images,
+        videoUrl: null,
       });
     }
 
     const videoUrl = safeHttpsUrl(data.play);
-
     if (!videoUrl) {
       return res.status(422).json({
-        error: "The service did not return a usable video link.",
+        error: "The service did not return downloadable video or photo media for this link.",
       });
     }
 
     return res.json({
-      title:
-        typeof data.title === "string"
-          ? data.title
-          : "TikTok video",
-      author:
-        typeof data.author?.nickname === "string"
-          ? data.author.nickname
-          : "",
-      cover: safeHttpsUrl(data.cover),
+      ...common,
+      mediaType: "video",
       videoUrl,
     });
   } catch (error) {
@@ -186,7 +192,6 @@ app.post("/api/video", async (req, res) => {
     });
 
     const timedOut = error.name === "TimeoutError";
-
     return res.status(timedOut ? 504 : 502).json({
       error: timedOut
         ? "The video service took too long. Please try again."
@@ -199,17 +204,13 @@ app.post("/api/video", async (req, res) => {
 
 app.use((error, req, res, next) => {
   if (res.headersSent) return next(error);
-
-  return res.status(400).json({
-    error: "Invalid request. Please check your link.",
-  });
+  return res.status(400).json({ error: "Invalid request. Please check your link." });
 });
 
 if (!process.env.VERCEL) {
   const server = app.listen(3001, "127.0.0.1", () => {
     console.log("TikZuno server ready on port 3001 — using RapidAPI");
   });
-
   server.on("error", (error) => {
     console.error("Server could not start:", error.message);
     process.exit(1);
