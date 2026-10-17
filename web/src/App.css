@@ -431,7 +431,7 @@ footer {
   justify-content: center;
   gap: 10px;
   transform-origin: center;
-  animation: intro-brand-open 900ms cubic-bezier(.65,0,.84,0) 1.45s forwards;
+  animation: intro-brand-open 700ms ease-in 1.55s forwards;
 }
 
 .intro-logo {
@@ -496,9 +496,9 @@ footer {
 }
 
 @keyframes intro-brand-open {
-  0% { transform: scale(1); opacity: 1; }
-  55% { opacity: 1; }
-  100% { transform: scale(18); opacity: 0; }
+  0% { transform: scale(1); opacity: 1; filter: blur(0); }
+  45% { transform: scale(1.12); opacity: 1; filter: blur(0); }
+  100% { transform: scale(1.45); opacity: 0; filter: blur(8px); }
 }
 
 @keyframes intro-glow-pulse {
