@@ -429,8 +429,9 @@ footer {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 14px;
+  gap: 10px;
   transform-origin: center;
+  animation: intro-brand-open 900ms cubic-bezier(.65,0,.84,0) 1.45s forwards;
 }
 
 .intro-logo {
@@ -445,8 +446,6 @@ footer {
   font-size: 43px;
   font-weight: 800;
   box-shadow: 0 0 55px #75f5ce40;
-  transform-origin: center;
-  animation: intro-logo-open 850ms cubic-bezier(.7,0,.84,0) 1.45s forwards;
 }
 
 .intro-wordmark {
@@ -496,10 +495,10 @@ footer {
   to { opacity: 0; transform: scale(1.08); }
 }
 
-@keyframes intro-logo-open {
-  0% { transform: scale(1); border-radius: 23px; opacity: 1; }
+@keyframes intro-brand-open {
+  0% { transform: scale(1); opacity: 1; }
   55% { opacity: 1; }
-  100% { transform: scale(24); border-radius: 50%; opacity: 0; }
+  100% { transform: scale(18); opacity: 0; }
 }
 
 @keyframes intro-glow-pulse {
@@ -519,6 +518,7 @@ footer {
 @media (prefers-reduced-motion: reduce) {
   .intro-screen,
   .intro-content,
+  .intro-brand,
   .intro-glow,
   .intro-loader span {
     animation-duration: 1ms;
