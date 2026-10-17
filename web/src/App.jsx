@@ -172,7 +172,7 @@ export default function App() {
           <div className="intro-glow" />
           <div className="intro-content">
             <div className="intro-brand">
-              <span className="intro-logo" aria-hidden="true">↓</span>
+              <svg className="intro-logo" viewBox="0 0 28 28" aria-hidden="true"><path d="M4 5h20l-7 7h6L9 24l3-9H5l7-10H4Z" fill="currentColor"/><path d="M18 15v8m-3-3 3 3 3-3" fill="none" stroke="#090d14" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"/></svg>
               <span className="intro-wordmark">Tik<span>Zuno</span></span>
             </div>
             <p className="intro-tagline">LESS CLUTTER. MORE VIDEO.</p>
@@ -183,7 +183,7 @@ export default function App() {
       <div className="site">
       <header className="header">
         <a className="brand" href="/" aria-label="TikZuno home">
-          <span className="brand-icon" aria-hidden="true">↓</span>
+          <svg className="brand-icon" viewBox="0 0 28 28" aria-hidden="true"><path d="M4 5h20l-7 7h6L9 24l3-9H5l7-10H4Z" fill="currentColor"/><path d="M18 15v8m-3-3 3 3 3-3" fill="none" stroke="#0b1018" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"/></svg>
           <span className="brand-name">Tik<span>Zuno</span></span>
         </a>
         <a className="nav-link" href="#how-it-works">How it works ↗</a>
