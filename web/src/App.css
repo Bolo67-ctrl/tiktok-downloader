@@ -422,7 +422,7 @@ footer {
   flex-direction: column;
   align-items: center;
   padding: 24px;
-  animation: intro-content-in 650ms cubic-bezier(.2,.8,.2,1) both, intro-content-out 500ms ease-in 1.55s forwards;
+  animation: intro-content-in 650ms cubic-bezier(.2,.8,.2,1) both;
 }
 
 .intro-brand {
@@ -431,7 +431,7 @@ footer {
   justify-content: center;
   gap: 10px;
   transform-origin: center;
-  animation: intro-brand-open 700ms ease-in 1.55s forwards;
+  animation: intro-brand-to-nav 850ms cubic-bezier(.65,0,.35,1) 1.35s forwards;
 }
 
 .intro-logo {
@@ -497,8 +497,13 @@ footer {
 
 @keyframes intro-brand-open {
   0% { transform: scale(1); opacity: 1; filter: blur(0); }
-  45% { transform: scale(1.12); opacity: 1; filter: blur(0); }
-  100% { transform: scale(1.45); opacity: 0; filter: blur(8px); }
+  100% { transform: scale(.45); opacity: 0; filter: blur(2px); }
+}
+
+@keyframes intro-brand-to-nav {
+  0% { transform: translate(0, 0) scale(1); opacity: 1; filter: blur(0); }
+  70% { opacity: 1; filter: blur(0); }
+  100% { transform: translate(-40vw, -41vh) scale(.45); opacity: 0; filter: blur(1px); }
 }
 
 @keyframes intro-glow-pulse {
