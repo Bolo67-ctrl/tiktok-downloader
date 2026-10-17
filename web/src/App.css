@@ -460,6 +460,7 @@ footer {
 }
 
 .intro-tagline {
+  animation: intro-content-out 350ms ease-in 1.25s forwards;
   margin: 10px 0 0;
   color: #aab3c2;
   font-size: 10px;
@@ -469,6 +470,7 @@ footer {
 }
 
 .intro-loader {
+  animation: intro-content-out 350ms ease-in 1.25s forwards;
   width: 112px;
   height: 3px;
   margin-top: 34px;
