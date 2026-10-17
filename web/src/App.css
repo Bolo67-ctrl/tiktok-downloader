@@ -34,15 +34,12 @@
 }
 
 .brand-icon {
-  display: grid;
-  place-items: center;
-  width: 36px;
-  height: 36px;
+  display: block;
+  flex: 0 0 auto;
+  width: 30px;
+  height: 30px;
   margin-right: 10px;
-  border-radius: 11px;
-  background: #75f5ce;
-  color: #101714;
-  font-size: 28px;
+  color: #75f5ce;
 }
 
 .nav-link {
@@ -444,17 +441,11 @@ footer {
 }
 
 .intro-logo {
-  display: grid;
-  flex: 0 0 auto;
-  place-items: center;
+  display: block;
   width: 58px;
   height: 58px;
-  border-radius: 16px;
-  background: #75f5ce;
-  color: #101714;
-  font-size: 43px;
-  font-weight: 800;
-  box-shadow: 0 0 55px #75f5ce40;
+  color: #75f5ce;
+  filter: drop-shadow(0 0 22px #75f5ce40);
 }
 
 .intro-wordmark {
