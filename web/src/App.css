@@ -402,7 +402,7 @@ footer {
   overflow: hidden;
   background: #090d14;
   color: #f5f7fb;
-  animation: intro-screen-out 650ms ease 1.75s forwards;
+  animation: intro-screen-out 750ms ease 1.85s forwards;
 }
 
 .intro-glow {
@@ -422,7 +422,7 @@ footer {
   flex-direction: column;
   align-items: center;
   padding: 24px;
-  animation: intro-content-in 650ms cubic-bezier(.2,.8,.2,1) both;
+  animation: intro-content-in 650ms cubic-bezier(.2,.8,.2,1) both, intro-content-out 500ms ease-in 1.55s forwards;
 }
 
 .intro-logo {
@@ -436,6 +436,8 @@ footer {
   font-size: 58px;
   font-weight: 800;
   box-shadow: 0 0 55px #75f5ce40;
+  transform-origin: center;
+  animation: intro-logo-open 850ms cubic-bezier(.7,0,.84,0) 1.45s forwards;
 }
 
 .intro-wordmark {
@@ -479,6 +481,16 @@ footer {
 @keyframes intro-content-in {
   from { opacity: 0; transform: translateY(16px) scale(.96); }
   to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+@keyframes intro-content-out {
+  to { opacity: 0; transform: scale(1.08); }
+}
+
+@keyframes intro-logo-open {
+  0% { transform: scale(1); border-radius: 23px; opacity: 1; }
+  55% { opacity: 1; }
+  100% { transform: scale(24); border-radius: 50%; opacity: 0; }
 }
 
 @keyframes intro-glow-pulse {
