@@ -212,9 +212,12 @@ export default function App() {
               <div className="photo-grid">
                 {video.images.map((imageUrl, index) => (
                   <article className="photo-item" key={imageUrl}>
-                    <a href={imageUrl} target="_blank" rel="noopener noreferrer" aria-label={`Open photo ${index + 1}`}>
-                      <img src={imageUrl} alt={`TikTok post photo ${index + 1}`} loading="lazy" />
-                    </a>
+                    <img
+                      className="photo-preview"
+                      src={imageUrl}
+                      alt={`TikTok post photo ${index + 1}`}
+                      loading="lazy"
+                    />
                     <button
                       className="download-button"
                       type="button"
