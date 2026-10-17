@@ -5,31 +5,31 @@
   "sourceLinkTitle": "Zuno",
   "sourceLinkUrl": "https://tikzuno.vercel.app",
   "sourceImage": "https://raw.githubusercontent.com/Bolo67-ctrl/tiktok-downloader/main/zuno-logo.svg",
-  "sourceUpdateTime": "2026-09-29T11:45:00-0400",
+  "sourceUpdateTime": "2026-10-16T22:00:00-0400",
   "sourceDescription": "Zuno apps — TikZuno and InstaZuno.",
   "appCategories": [
     "Tools"
   ],
   "appRepositories": [
     {
-      "appType": "SELF_SIGN",
+      "appType": "LINK",
       "appCateIndex": 0,
-      "appUpdateTime": "2026-09-29T11:45:00-0400",
+      "appUpdateTime": "2026-10-16T22:00:00-0400",
       "appName": "TikZuno",
-      "appVersion": "1.0.1",
+      "appVersion": "1.0.0",
       "appImage": "https://raw.githubusercontent.com/Bolo67-ctrl/tiktok-downloader/main/zuno-logo.svg",
-      "appPackage": "https://github.com/Bolo67-ctrl/tiktok-downloader/releases/download/v1.0.0/TikZuno-1.0.1-unsigned.ipa",
-      "appDescription": "TikTok downloader."
+      "appPackage": "https://tikzuno.vercel.app",
+      "appDescription": "TikTok downloader. Opens TikZuno."
     },
     {
-      "appType": "SELF_SIGN",
+      "appType": "LINK",
       "appCateIndex": 0,
-      "appUpdateTime": "2026-09-29T11:45:00-0400",
+      "appUpdateTime": "2026-10-16T22:00:00-0400",
       "appName": "InstaZuno",
       "appVersion": "1.0.2",
       "appImage": "https://raw.githubusercontent.com/Bolo67-ctrl/tiktok-downloader/main/zuno-logo.svg",
-      "appPackage": "https://github.com/Bolo67-ctrl/tiktok-downloader/releases/download/v1.0.0/Instazuno-1.0.2.ipa",
-      "appDescription": "Instagram downloader."
+      "appPackage": "https://instazuno.davefrancois043.chatgpt.site",
+      "appDescription": "Instagram downloader. Opens InstaZuno."
     }
   ]
 }
