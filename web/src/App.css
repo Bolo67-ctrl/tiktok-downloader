@@ -20,7 +20,16 @@
   letter-spacing: -1px;
 }
 
-.brand > span:last-child {
+.brand {
+  color: #f5f7fb;
+  text-decoration: none;
+}
+
+.brand-name {
+  color: #f5f7fb;
+}
+
+.brand-name > span {
   color: #75f5ce;
 }
 
