@@ -171,8 +171,10 @@ export default function App() {
         <div className="intro-screen" role="status" aria-label="Welcome to TikZuno">
           <div className="intro-glow" />
           <div className="intro-content">
-            <div className="intro-logo">↓</div>
-            <div className="intro-wordmark">Tik<span>Zuno</span></div>
+            <div className="intro-brand">
+              <span className="intro-logo" aria-hidden="true">↓</span>
+              <span className="intro-wordmark">Tik<span>Zuno</span></span>
+            </div>
             <p className="intro-tagline">LESS CLUTTER. MORE VIDEO.</p>
             <div className="intro-loader"><span /></div>
           </div>
